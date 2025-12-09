@@ -1,0 +1,17 @@
+.hero,
+.card,
+.feature,
+.cta {
+    /* Maintien de la mise en page: applique l'ombre aux éléments spécifiés */
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, .14),
+        0 8px 24px rgba(0, 0, 0, .22),
+        0 24px 60px rgba(0, 0, 0, .18);
+}
+
+/*
+Toutes les classes .extra-X ont été supprimées.
+Elles étaient redondantes (plusieurs classes ont la même valeur de 'filter: brightness()')
+et inutiles (non appliquées à des éléments visibles pour le lancement de la page,
+ou sans effet si non utilisées dans le HTML).
+*/

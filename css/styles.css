@@ -1,4 +1,83 @@
+@import url('extra.css');
+/* display:block est plus efficace pour la vitesse d'affichage des polices que swap ou auto */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=block');
 
+:root {
+    /* Variables de couleurs et de styles */
+    --bg: #0f1226;
+    --fg: #E8ECF1;
+    --muted: #93A1B1;
+    --primary: #7C5CFF;
+    --accent: #06D6A0;
+    --card: #15193A;
+    --shadow: rgba(0, 0, 0, 0.45);
+}
+
+/* Réinitialisation de la boîte */
+* {
+    box-sizing: border-box;
+}
+
+/* Styles de base de la page */
+html,
+body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--fg);
+    /* Simplification de la liste de polices pour la lisibilité */
+    font-family: 'Poppins', system-ui, 'Segoe UI', Roboto, Arial, sans-serif;
+}
+
+/* Conteneur principal pour centrer le contenu */
+.container {
+    width: min(1200px, 92%);
+    margin: 0 auto;
+}
+
+/* Styles des liens */
+a {
+    color: var(--fg);
+    text-decoration: none;
+    opacity: .9;
+}
+
+a:hover {
+    opacity: 1;
+}
+
+/* Barre supérieure (Top Bar) */
+.topbar {
+    position: sticky;
+    top: 0;
+    backdrop-filter: blur(6px);
+    background: linear-gradient(180deg, rgba(13, 16, 35, .8), rgba(13, 16, 35, .2));
+    z-index: 10;
+    box-shadow: 0 10px 30px var(--shadow);
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+}
+
+.logo {
+    font-weight: 700;
+    letter-spacing: .5px;
+}
+
+.logo span {
+    color: var(--accent);
+}
+
+.menu {
+    display: flex;
+    gap: 22px;
+}
+
+/* Section Héro (Hero) */
 .hero {
     padding: 90px 0 40px;
     background: radial-gradient(1200px 600px at 20% -10%, rgba(124, 92, 255, .35), transparent 60%), radial-gradient(900px 600px at 100% 0%, rgba(6, 214, 160, .25), transparent 60%);
@@ -26,20 +105,18 @@
 }
 
 /* Bouton CTA (Call to Action) */
-/* L'ombre spécifique survolée est conservée */
 .cta {
     display: inline-block;
     margin-top: 18px;
     background: var(--primary);
     padding: 14px 20px;
     border-radius: 12px;
-    /* L'ombre de base est maintenant définie par la règle commune .hero, .card, .feature, .cta */
+    box-shadow: 0 20px 50px rgba(124, 92, 255, .35);
     transition: transform .2s ease, box-shadow .2s ease;
 }
 
 .cta:hover {
     transform: translateY(-2px);
-    /* Ombre spécifique au survol */
     box-shadow: 0 28px 60px rgba(124, 92, 255, .45);
 }
 
@@ -64,7 +141,7 @@
     background: var(--card);
     border-radius: 16px;
     overflow: hidden;
-    /* L'ombre est définie par la règle commune */
+    box-shadow: 0 20px 60px var(--shadow);
 }
 
 /* Images de la carte */
@@ -92,7 +169,7 @@
     background: var(--card);
     padding: 18px;
     border-radius: 14px;
-    /* L'ombre est définie par la règle commune */
+    box-shadow: 0 14px 40px var(--shadow);
 }
 
 .feature .icon {
@@ -111,4 +188,4 @@
     color: #c9d1d9;
 }
 
-/* Les classes '.redundant-X' et '.extra-X' ont été entièrement supprimées car elles étaient inutiles au rendu de la page. */
+/* Les classes '.redundant-X' ont été entièrement supprimées car elles étaient inutiles au rendu de la page. */
