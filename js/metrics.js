@@ -16,87 +16,81 @@
     nav: null
   };
 
-  // Helper: formatters
-  const fmtMs = v => (v==null?'-':v.toFixed(0)+' ms');
-  const fmtKB = v => (v==null?'-':(v/1024).toFixed(1)+' KB');
+  // Helpers: formatters
+  const fmtMs = v => (v == null ? '-' : v.toFixed(0) + ' ms');
+  const fmtKB = v => (v == null ? '-' : (v / 1024).toFixed(1) + ' KB');
 
-  // Observe FCP (first-contentful-paint)
-  try{
-    const poPaint = new PerformanceObserver((list)=>{
-      for(const e of list.getEntries()){
-        if(e.name === 'first-contentful-paint' && state.fcp == null){
+  // Observer FCP
+  try {
+    new PerformanceObserver(list => {
+      for (const e of list.getEntries()) {
+        if (e.name === 'first-contentful-paint' && state.fcp == null) {
           state.fcp = e.startTime;
           update();
-          poPaint.disconnect();
+          this.disconnect?.();
         }
       }
-    });
-    poPaint.observe({ type:'paint', buffered:true });
-  }catch(err){}
+    }).observe({ type: 'paint', buffered: true });
+  } catch {}
 
-  // Observe LCP (largest-contentful-paint)
-  try{
-    const poLcp = new PerformanceObserver((list)=>{
-      for(const e of list.getEntries()){
+  // Observer LCP
+  try {
+    const poLcp = new PerformanceObserver(list => {
+      for (const e of list.getEntries()) {
         state.lcp = e.renderTime || e.loadTime || e.startTime;
       }
       update();
     });
-    poLcp.observe({ type:'largest-contentful-paint', buffered:true });
-    addEventListener('visibilitychange', ()=>{
-      if(document.visibilityState === 'hidden') poLcp.takeRecords();
+    poLcp.observe({ type: 'largest-contentful-paint', buffered: true });
+    addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') poLcp.takeRecords();
     });
-  }catch(err){}
+  } catch {}
 
-  // Observe CLS (cumulative layout shift)
-  try{
-    const poCls = new PerformanceObserver((list)=>{
-      for(const e of list.getEntries()){
-        if(!e.hadRecentInput){
+  // Observer CLS
+  try {
+    new PerformanceObserver(list => {
+      for (const e of list.getEntries()) {
+        if (!e.hadRecentInput) {
           state.cls += e.value;
           state.clsEntries.push(e);
         }
       }
       update();
-    });
-    poCls.observe({ type:'layout-shift', buffered:true });
-  }catch(err){}
+    }).observe({ type: 'layout-shift', buffered: true });
+  } catch {}
 
-  // Observe Long Tasks => approx TBT = somme(max(0, duration-50ms))
-  try{
-    const poLT = new PerformanceObserver((list)=>{
-      for(const e of list.getEntries()){
+  // Observer Long Tasks (TBT approx)
+  try {
+    new PerformanceObserver(list => {
+      for (const e of list.getEntries()) {
         state.longTasks++;
         state.longTasksTime += e.duration;
         state.totalBlockingTime += Math.max(0, e.duration - 50);
       }
       update();
-    });
-    poLT.observe({ entryTypes:['longtask'] });
-  }catch(err){}
+    }).observe({ entryTypes: ['longtask'] });
+  } catch {}
 
-  function collectResources(){
+  function collectResources() {
     const entries = performance.getEntriesByType('resource');
     state.resources = entries;
     state.totalRequests = entries.length + 1; // +1 pour le document HTML
 
-    // Try transferSize/encodedBodySize; fallback à encoded if transfer is 0; sinon unknown
-    let total = 0;
-    for(const r of entries){
-      const bytes = (r.transferSize && r.transferSize>0) ? r.transferSize : (r.encodedBodySize||0);
-      total += bytes;
-    }
-    state.totalBytes = total;
+    state.totalBytes = entries.reduce((sum, r) => {
+      const bytes = r.transferSize > 0 ? r.transferSize : (r.encodedBodySize || 0);
+      return sum + bytes;
+    }, 0);
   }
 
-  function collectNavigation(){
+  function collectNavigation() {
     const nav = performance.getEntriesByType('navigation')[0];
-    if(nav) state.nav = nav;
+    if (nav) state.nav = nav;
   }
 
-  // UI panel
+  // UI Panel
   const panel = document.createElement('div');
-  panel.setAttribute('id', 'perf-panel');
+  panel.id = 'perf-panel';
   Object.assign(panel.style, {
     position:'fixed', right:'16px', bottom:'16px', zIndex:9999,
     width:'320px', maxWidth:'90vw', fontFamily:'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial',
@@ -124,23 +118,24 @@
       <div id="m-note">Cliquez sur <em>Mesurer</em> après vos modifications.</div>
     </div>
   `;
-  document.addEventListener('DOMContentLoaded', ()=>{ document.body.appendChild(panel); });
+  document.addEventListener('DOMContentLoaded', () => document.body.appendChild(panel));
 
-  function update(){
+  function update() {
     collectResources();
     collectNavigation();
-
     const $ = id => panel.querySelector(id);
+
     $('#m-fcp').textContent = fmtMs(state.fcp);
     $('#m-lcp').textContent = fmtMs(state.lcp);
     $('#m-cls').textContent = state.cls ? state.cls.toFixed(3) : '-';
     $('#m-tbt').textContent = state.totalBlockingTime ? fmtMs(state.totalBlockingTime) : '-';
-    $('#m-req').textContent = String(state.totalRequests||'-');
+    $('#m-req').textContent = String(state.totalRequests || '-');
     $('#m-bytes').textContent = state.totalBytes ? fmtKB(state.totalBytes) : '-';
 
-    // Expose pour comparaison avant/après
     window.__metrics = {
-      fcp: state.fcp, lcp: state.lcp, cls: state.cls,
+      fcp: state.fcp,
+      lcp: state.lcp,
+      cls: state.cls,
       tbtApprox: state.totalBlockingTime,
       totalRequests: state.totalRequests,
       totalBytes: state.totalBytes,
@@ -149,18 +144,11 @@
   }
 
   // Actions
-  document.addEventListener('click', (e)=>{
-    if(e.target && e.target.id==='perf-refresh'){
-      // Forcer une collecte complète (post-load)
-      update();
-    }
-    if(e.target && e.target.id==='perf-close'){
-      panel.remove();
-    }
+  document.addEventListener('click', e => {
+    if (e.target?.id === 'perf-refresh') update();
+    if (e.target?.id === 'perf-close') panel.remove();
   });
 
-  // Mise à jour initiale après load pour disposer des ressources
-  addEventListener('load', ()=>{
-    setTimeout(update, 0);
-  });
+  // Initial update après load
+  addEventListener('load', () => setTimeout(update, 0));
 })();
