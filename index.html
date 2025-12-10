@@ -2,20 +2,11 @@
 <html lang="fr">
   <head>
     <meta charset="utf-8" />
-
-    <!-- Viewport optimisé (mieux pour le CLS + responsive) -->
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Site vitrine</title>
-
-    <!-- CSS chargé en priorité, mais avec preconnect pour accélérer -->
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="css/styles.css" />
-
-    <!-- Script principal déplacé + defer pour réduire le TBT -->
-    <script src="js/script.js" defer></script>
+    <script src="js/script.js"></script>
   </head>
-
   <body>
     <div class="topbar">
       <div class="container nav">
@@ -37,47 +28,28 @@
         </div>
       </div>
     </div>
-
+<br>
     <div id="galerie" class="section gallery">
       <div class="container">
         <h2>Galerie</h2>
-
         <div class="grid">
-          <!-- AJOUT : width + height (+ loading="lazy") → boost énorme LCP/FCP -->
           <div class="card">
-            <a href="img1.html">
-              <img src="img/img1.webp" alt="Image 1" width="400" height="250" loading="lazy" />
-            </a>
+            <a href="img1.html"><img src="img/img1_11zon.webp" alt="Image 1" /></a>
           </div>
-
           <div class="card">
-            <a href="img2.html">
-              <img src="img/img2.webp" alt="Image 2" width="400" height="250" loading="lazy" />
-            </a>
+            <a href="img2.html"><img src="img/img2_11zon.webp" alt="Image 2" /></a>
           </div>
-
           <div class="card">
-            <a href="img3.html">
-              <img src="img/img3.webp" alt="Image 3" width="400" height="250" loading="lazy" />
-            </a>
+            <a href="img3.html"><img src="img/img3_11zon.webp" alt="Image 3" /></a>
           </div>
-
           <div class="card">
-            <a href="img4.html">
-              <img src="img/img4.webp" alt="Image 4" width="400" height="250" loading="lazy" />
-            </a>
+            <a href="img4.html"><img src="img/img4_11zon.webp" alt="Image 4" /></a>
           </div>
-
           <div class="card">
-            <a href="img5.html">
-              <img src="img/img5.webp" alt="Image 5" width="400" height="250" loading="lazy" />
-            </a>
+            <a href="img5.html"><img src="img/img5_11zon.webp" alt="Image 5" /></a>
           </div>
-
           <div class="card">
-            <a href="img6.html">
-              <img src="img/img6.webp" alt="Image 6" width="400" height="250" loading="lazy" />
-            </a>
+            <a href="img6.html"><img src="img/img6_11zon.webp" alt="Image 6" /></a>
           </div>
         </div>
       </div>
@@ -86,26 +58,22 @@
     <div id="apropos" class="section features">
       <div class="container">
         <h2>Fonctionnalités</h2>
-
         <div class="features-grid">
           <div class="feature">
             <div class="icon">⚡</div>
             <h3>Design moderne</h3>
             <p>Couleurs, ombres, grille responsive.</p>
           </div>
-
           <div class="feature">
             <div class="icon">🧱</div>
             <h3>Scripts</h3>
             <p>Intégration de scripts pour effets visuels.</p>
           </div>
-
           <div class="feature">
             <div class="icon">🖼️</div>
             <h3>Images</h3>
             <p>Galerie de visuels variés.</p>
           </div>
-
           <div class="feature">
             <div class="icon">🔠</div>
             <h3>Polices</h3>
@@ -134,8 +102,6 @@
         <p>© 2025 — BUT MMI Béziers - MAURIN N.</p>
       </div>
     </div>
-
-    <!-- Metrics non bloquant (déjà bien) -->
     <script src="js/metrics.js" defer></script>
   </body>
 </html>
