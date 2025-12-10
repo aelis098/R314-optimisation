@@ -1,43 +1,6 @@
-/* metrics.js — widget d'évaluation des performances (client-side) et tâches de blocage
-   Le code de simulation de charge (blocage du thread) est déplacé au début.
-   Le widget affiche FCP, LCP, CLS, TBT (~approx), #requêtes et poids total.
-   N'emploie aucune dépendance externe.
-*/
-
-// --- DÉBUT DU CODE DE SIMULATION DE CHARGE ET D'ACTIVITÉ ---
-
-(function(){
-  // Tâche longue SYNCHRONE DÉLIBÉRÉE (bloque le thread principal pendant 2000 ms)
-  const start = performance.now();
-  while (performance.now() - start < 2000) {}
-
-  // Tâche de calcul lourde (génération de 200 000 nombres aléatoires)
-  const waste = [];
-  for (let i=0;i<200000;i++) { waste.push(Math.random()*i); }
-  window.__waste = waste; // Stocké pour éviter l'optimisation complète par le moteur JS
-
-  window.addEventListener('load', function(){
-    // Gestion du chargement différé des images
-    const imgs = document.querySelectorAll('.card img');
-    imgs.forEach(img => { 
-      if (img.complete) {
-        img.classList.add('loaded');
-      } else {
-        img.addEventListener('load', ()=> img.classList.add('loaded'));
-      }
-    });
-    
-    // Deuxième tâche longue SYNCHRONE DÉLIBÉRÉE (bloque le thread principal pendant 1000 ms) après le chargement des ressources
-    const t0 = performance.now();
-    while (performance.now() - t0 < 1000) {}
-  });
-})();
-
-// --- FIN DU CODE DE SIMULATION DE CHARGE ET D'ACTIVITÉ ---
-
-
-// --- DÉBUT DU CODE DU WIDGET D'ÉVALUATION DES PERFORMANCES ---
-
+/* metrics.js — widget d'évaluation des performances (client-side)
+   Affiche FCP, LCP, CLS, TBT (~approx), #requêtes et poids total.
+   N'emploie aucune dépendance externe. */
 (function(){
   const state = {
     fcp: null,
@@ -103,8 +66,7 @@
       for (const e of list.getEntries()) {
         state.longTasks++;
         state.longTasksTime += e.duration;
-        // TBT est la somme du temps excédant 50ms par tâche longue
-        state.totalBlockingTime += Math.max(0, e.duration - 50); 
+        state.totalBlockingTime += Math.max(0, e.duration - 50);
       }
       update();
     }).observe({ entryTypes: ['longtask'] });
@@ -116,7 +78,6 @@
     state.totalRequests = entries.length + 1; // +1 pour le document HTML
 
     state.totalBytes = entries.reduce((sum, r) => {
-      // Utilise transferSize si disponible (taille réelle transférée), sinon encodedBodySize
       const bytes = r.transferSize > 0 ? r.transferSize : (r.encodedBodySize || 0);
       return sum + bytes;
     }, 0);
@@ -167,12 +128,10 @@
     $('#m-fcp').textContent = fmtMs(state.fcp);
     $('#m-lcp').textContent = fmtMs(state.lcp);
     $('#m-cls').textContent = state.cls ? state.cls.toFixed(3) : '-';
-    // Le TBT affiché inclura le blocage délibéré simulé (2000ms au début + 1000ms au load)
     $('#m-tbt').textContent = state.totalBlockingTime ? fmtMs(state.totalBlockingTime) : '-';
     $('#m-req').textContent = String(state.totalRequests || '-');
     $('#m-bytes').textContent = state.totalBytes ? fmtKB(state.totalBytes) : '-';
 
-    // Exportation des métriques pour un accès externe
     window.__metrics = {
       fcp: state.fcp,
       lcp: state.lcp,
@@ -191,7 +150,5 @@
   });
 
   // Initial update après load
-  // Le setTimeout permet au navigateur de terminer le rendu et l'exécution
-  // de la tâche longue synchrone de 1000ms définie dans le premier bloc de code
   addEventListener('load', () => setTimeout(update, 0));
 })();
